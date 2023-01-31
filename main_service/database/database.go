@@ -5,6 +5,8 @@ import (
 	"sync"
 	"database/sql"
 	"github.com/go-sql-driver/mysql"
+
+	"github.com/transactional_outbox_pattern/main_service/model"
 )
 var lock = &sync.Mutex{}
 
@@ -33,6 +35,12 @@ func NewDBConnection() *DBConnection {
 	}
 
 	return dbInstance
+}
+
+func (db DBConnection) insertData(user *model.User) {
+	var connection *sql.DB = db.DB
+	// TODO: ADD transaction
+
 }
 
 func getDBInfo() *mysql.Config {
