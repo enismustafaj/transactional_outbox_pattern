@@ -3,6 +3,8 @@ package database
 import (
 	"os"
 	"sync"
+	"log"
+	"math/rand"
 	"database/sql"
 	"github.com/go-sql-driver/mysql"
 
@@ -40,7 +42,22 @@ func NewDBConnection() *DBConnection {
 func (db DBConnection) insertData(user *model.User) {
 	var connection *sql.DB = db.DB
 	// TODO: ADD transaction
+	tx, err := connection.Begin()
 
+	if err != nil {
+		log.Fatal("Error creating transaction")
+	}
+	var userId int = rand.Int()
+
+	_, execError := tx.Exec(`insert into user_table (UserId, FirstName, LastName) values (?, ?, ?)`, userId, user.FirstName, user.LastName)
+
+	if execError != nil {
+		log.Fatal("inserting data error")
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getDBInfo() *mysql.Config {

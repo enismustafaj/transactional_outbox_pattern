@@ -18,4 +18,4 @@ create table outbox_table (
     EventId int,
     Event varchar(255),
     primary key (EventId)
-)
+) 
