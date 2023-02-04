@@ -28,7 +28,7 @@ func NewReader() *Reader {
 	return reader
 }
 
-func (r *Reader) start() {
+func (r *Reader) Start() {
 	ticker := time.NewTicker(1000 * time.Millisecond)
 
 	for {
@@ -38,6 +38,7 @@ func (r *Reader) start() {
 			return
 		case <-ticker.C:
 			r.readEvents()
+			time.Sleep(5000 * time.Millisecond)
 		}
 	}
 }
