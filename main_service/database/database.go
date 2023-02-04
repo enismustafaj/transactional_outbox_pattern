@@ -41,7 +41,6 @@ func NewDBConnection() *DBConnection {
 
 func (db DBConnection) insertData(user *model.User) {
 	var connection *sql.DB = db.DB
-	// TODO: ADD transaction
 	tx, err := connection.Begin()
 
 	if err != nil {
