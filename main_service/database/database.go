@@ -54,10 +54,17 @@ func (db DBConnection) InsertData(user *model.User) {
 	}
 	var userId int = rand.Int() % 100000
 
-	_, execError := tx.Exec(`insert into user_table (UserId, FirstName, LastName) values (?, ?, ?)`, userId, user.FirstName, user.LastName)
+	_, userDataInsertError := tx.Exec(`insert into user_table (UserId, FirstName, LastName) values (?, ?, ?)`, userId, user.FirstName, user.LastName)
 
-	if execError != nil {
-		log.Println("inserting data error: ", execError)
+	if userDataInsertError != nil {
+		log.Println("inserting user data error: ", userDataInsertError)
+	}
+
+	var eventId int = rand.Int() % 100000
+	_, eventDataInsertError := tx.Exec(`insert into outbox_table (EventId, Event) values (?, ?)`, eventId, "event")
+
+	if eventDataInsertError != nil {
+		log.Println("inserting event data error: ", eventDataInsertError)
 	}
 
 	if err := tx.Commit(); err != nil {
