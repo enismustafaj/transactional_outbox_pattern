@@ -1,6 +1,7 @@
 package event_reader
 
 import (
+	"os"
 	"log"
 	"database/sql"
 	"time"
@@ -35,7 +36,7 @@ func (r *Reader) start() {
 		case err := <- r.ErrorChan:
 			log.Fatal(err)
 			return
-		case t := <-ticker.C:
+		case <-ticker.C:
 			r.readEvents()
 		}
 	}
@@ -44,9 +45,9 @@ func (r *Reader) start() {
 func (r *Reader) readEvents() {
 	var connection *sql.DB = r.DBConnection
 
-	rows, err := connection.Query("select * from outbox_table limit 2")
+	_, err := connection.Query("select * from outbox_table limit 2")
 
-	if err != nli {
+	if err != nil {
 		log.Fatal("Error fetching events from outbox table", err)
 	}
 
