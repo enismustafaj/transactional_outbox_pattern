@@ -28,6 +28,12 @@ func NewDBConnection() *DBConnection {
 		defer lock.Unlock()
 		db, err := sql.Open("mysql", getDBInfo().FormatDSN())
 
+		connectionError := db.Ping()
+
+		if connectionError != nil {
+			log.Fatal("Error connecting to db: ", connectionError)
+		}
+
 		if err == nil {
 			dbInstance = &DBConnection{
 				DB: db,
@@ -39,19 +45,19 @@ func NewDBConnection() *DBConnection {
 	return dbInstance
 }
 
-func (db DBConnection) insertData(user *model.User) {
+func (db DBConnection) InsertData(user *model.User) {
 	var connection *sql.DB = db.DB
 	tx, err := connection.Begin()
 
 	if err != nil {
 		log.Fatal("Error creating transaction")
 	}
-	var userId int = rand.Int()
+	var userId int = rand.Int() % 100000
 
 	_, execError := tx.Exec(`insert into user_table (UserId, FirstName, LastName) values (?, ?, ?)`, userId, user.FirstName, user.LastName)
 
 	if execError != nil {
-		log.Fatal("inserting data error")
+		log.Println("inserting data error: ", execError)
 	}
 
 	if err := tx.Commit(); err != nil {

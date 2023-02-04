@@ -13,7 +13,7 @@ create table user_table (
 );
 
 -- Create Outbox Table
-drop table if exists outbox_table
+drop table if exists outbox_table;
 create table outbox_table (
     EventId int,
     Event varchar(255),
