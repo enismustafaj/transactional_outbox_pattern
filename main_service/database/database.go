@@ -55,13 +55,19 @@ func (db DBConnection) InsertData(user *model.User) {
 	entityId, userDataInsertError := tx.Exec(`insert into user_table (FirstName, LastName) values (?, ?)`, user.FirstName, user.LastName)
 
 	if userDataInsertError != nil  {
-		log.Println("inserting user data error: ", userDataInsertError)
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			log.Fatalf("unable to rollback: %v", rollbackErr)
+		}
+		log.Fatal("inserting user data error: ", userDataInsertError)
 	}
 
 	entityIdResult, _ := entityId.LastInsertId()
-	_, eventDataInsertError := tx.Exec(`insert into outbox_table (Event, EntityId) values (?, ?)`, eventId, entityIdResult)
+	_, eventDataInsertError := tx.Exec(`insert into outbox_table (Event, EntityId) values (?, ?)`, "event", entityIdResult)
 
 	if eventDataInsertError != nil {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			log.Fatalf("unable to rollback: %v", rollbackErr)
+		}
 		log.Fatal("inserting event data error: ", eventDataInsertError)
 	}
 
