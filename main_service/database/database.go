@@ -4,7 +4,6 @@ import (
 	"os"
 	"sync"
 	"log"
-	"math/rand"
 	"database/sql"
 	"github.com/go-sql-driver/mysql"
 
@@ -52,19 +51,18 @@ func (db DBConnection) InsertData(user *model.User) {
 	if err != nil {
 		log.Fatal("Error creating transaction")
 	}
-	var userId int = rand.Int() % 100000
 
-	_, userDataInsertError := tx.Exec(`insert into user_table (UserId, FirstName, LastName) values (?, ?, ?)`, userId, user.FirstName, user.LastName)
+	entityId, userDataInsertError := tx.Exec(`insert into user_table (FirstName, LastName) values (?, ?)`, user.FirstName, user.LastName)
 
-	if userDataInsertError != nil {
+	if userDataInsertError != nil  {
 		log.Println("inserting user data error: ", userDataInsertError)
 	}
 
-	var eventId int = rand.Int() % 100000
-	_, eventDataInsertError := tx.Exec(`insert into outbox_table (EventId, Event) values (?, ?)`, eventId, "event")
+	entityIdResult, _ := entityId.LastInsertId()
+	_, eventDataInsertError := tx.Exec(`insert into outbox_table (Event, EntityId) values (?, ?)`, eventId, entityIdResult)
 
 	if eventDataInsertError != nil {
-		log.Println("inserting event data error: ", eventDataInsertError)
+		log.Fatal("inserting event data error: ", eventDataInsertError)
 	}
 
 	if err := tx.Commit(); err != nil {
