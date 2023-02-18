@@ -38,7 +38,6 @@ func (r *Reader) Start() {
 			return
 		case <-ticker.C:
 			r.readEvents()
-			time.Sleep(5000 * time.Millisecond)
 		}
 	}
 }
@@ -53,6 +52,7 @@ func (r *Reader) readEvents() {
 	}
 
 	log.Println("Events fetched from outbox table")
+	time.Sleep(3000 * time.Millisecond)
 }
 
 func getDBInfo() *mysql.Config {
