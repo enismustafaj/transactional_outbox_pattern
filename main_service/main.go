@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/transactional_outbox_pattern/main_service/database"
-	"github.com/transactional_outbox_pattern/main_service/model"
+	"github.com/transactional_outbox_pattern/main_service/handlers"
 )
 
 func init() {
@@ -25,23 +25,13 @@ var db *database.DBConnection
 func main() {
 	var serverPort string = os.Getenv("PORT")
 	server := gin.Default()
-	server.POST("/api/data", handleRequest)
+	server.POST("/api/data", handlers.)
 
 	log.Println("Listening on Port: ", serverPort)
 
 	db = database.NewDBConnection()
 
 	server.Run("localhost:" + serverPort)
-}
 
-func handleRequest(context *gin.Context) {
-		var user model.User
-
-		if err := context.BindJSON(&user); err != nil {
-			return
-		}
-
-		db.InsertData(&user)
-
-		context.IndentedJSON(http.StatusCreated, user)
+	defer db.DB.Close()
 }
