@@ -8,7 +8,7 @@ import (
 	"github.com/transactional_outbox_pattern/main_service/model"
 )
 
-func createUserHandler(context *gin.Context) {
+func CreateUserHandler(context *gin.Context) {
 	var user model.User
 
 	if err := context.BindJSON(&user); err != nil {
