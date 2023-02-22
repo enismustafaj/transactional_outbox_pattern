@@ -26,6 +26,7 @@ func main() {
 	var serverPort string = os.Getenv("PORT")
 	server := gin.Default()
 	server.POST("/api/data", handlers.CreateUserHandler)
+	server.Use(handlers.RateLimiterMiddleWare)
 
 	log.Println("Listening on Port: ", serverPort)
 

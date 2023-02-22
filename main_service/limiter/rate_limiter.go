@@ -4,6 +4,7 @@ import (
 	"os"
 	"log"
 	"time"
+	"sync"
 	"strconv"
 	"github.com/redis/go-redis/v9"
 
@@ -14,10 +15,22 @@ type RateLimiter struct {
 	dbConnection *database.RedisDB
 }
 
+var rateLimiter *RateLimiter
+var lock = &sync.Mutex{}
+
 func NewRateLimiter() *RateLimiter {
-	return &RateLimiter{
-		database.NewRedisDBConnection(getRedisDBInfo()),
+
+	if rateLimiter == nil {
+		lock.Lock()
+		defer lock.Unlock()
+
+		rateLimiter = &RateLimiter{
+			database.NewRedisDBConnection(getRedisDBInfo()),
+		}
+
 	}
+
+	return rateLimiter
 }
 
 func (r *RateLimiter) Run() {
@@ -36,7 +49,7 @@ func (r *RateLimiter) fillBucket() {
 	r.dbConnection.SetKey("tokens", 3)
 }
 
-func (r *RateLimiter) isBucketEmpty() bool {
+func (r *RateLimiter) IsBucketEmpty() bool {
 	val, err := strconv.Atoi(r.dbConnection.GetVal("tokens"))
 
 	if err != nil {
